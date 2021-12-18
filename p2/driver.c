@@ -28,15 +28,10 @@ int main(int argc, char *argv[])
     while (fgets(access,SIZE,in) != NULL) {
         temp = strdup(access);
         position = atoi(strsep(&temp,","));
-
-        // add the task to the scheduler's list of tasks
-        //printf("Before Add\n");
-        //printf("Prior: %d\n", burst);
         add(position);
 
         free(temp);
     }
-
     fclose(in);
 
     // invoke the scheduler

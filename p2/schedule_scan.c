@@ -19,6 +19,46 @@ void add(int position)
     insert(&head, current_access);
 }
 
+struct node* get_next_down(struct node *temp, int track){
+    int min_dis = __INT_MAX__;
+    int dis;
+    struct node *next = NULL;
+    while (temp != NULL)
+    {
+        if (temp->access->position < track)
+        {
+            dis = abs(temp->access->position -  track);
+            if (min_dis > dis)
+            {
+                min_dis = dis;
+                next = temp;
+            }
+        }
+        temp = temp->next;
+    }
+    return next;
+}
+
+struct node* get_next_up(struct node *temp, int track){
+    int min_dis = __INT_MAX__;
+    int dis;
+    struct node *next = NULL;
+    while (temp != NULL)
+    {
+        if (temp->access->position > track)
+        {
+            dis = abs(temp->access->position -  track);
+            if (min_dis > dis)
+            {
+                min_dis = dis;
+                next = temp;
+            }
+        }
+        temp = temp->next;
+    }
+    return next;
+}
+
 void schedule()
 {
     struct node *temp;
@@ -29,28 +69,31 @@ void schedule()
     int track = 100;
     int total_tracks_traverse = 0;
     float avg_seek_length_time = 0;
-    int traverse;
-    int pos = 0;
+    int trav;
+    int up = 0;
     while (temp != NULL)
     {
-        while (temp != NULL)
+        if (up)
+            temp2 = get_next_up(temp, track);
+        else
+            temp2 = get_next_down(temp, track);
+        //printf("%p \n", temp2);
+        if (temp2 == NULL)
         {
-            if (temp->access->position > pos)
-            {
-                temp2 = temp;
-                pos = temp->access->position;
-            }
-            temp = temp->next;
+            up = abs(up - 1);
+            temp = head;
         }
-
-        traverse = abs(track - temp->access->position);
-        run(temp->access, traverse);
-        total_tracks_traverse += traverse;
-        track = temp2->access->position;
-        n++;
-        t = temp2->access;
-        temp = head;
-        delete (&head, t);
+        else
+        {
+            trav = abs(track - temp2->access->position);
+            run(temp2->access, trav);
+            total_tracks_traverse += trav;
+            track = temp2->access->position;
+            n++;
+            t = temp2->access;
+            temp = head;
+            delete (&head, t);
+        }
     }
 
     avg_seek_length_time = (float)total_tracks_traverse / n;

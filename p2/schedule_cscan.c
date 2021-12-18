@@ -9,6 +9,7 @@
 
 struct node *head;
 int id = 0;
+int MEM_SIZE = 200;
 
 void add(int position)
 {
@@ -19,6 +20,26 @@ void add(int position)
     insert(&head, current_access);
 }
 
+struct node* get_next_up(struct node *temp, int track){
+    int min_dis = __INT_MAX__;
+    int dis;
+    struct node *next = NULL;
+    while (temp != NULL)
+    {
+        if (temp->access->position > track)
+        {
+            dis = abs(temp->access->position -  track);
+            if (min_dis > dis)
+            {
+                min_dis = dis;
+                next = temp;
+            }
+        }
+        temp = temp->next;
+    }
+    return next;
+}
+
 void schedule()
 {
     struct node *temp;
@@ -26,30 +47,33 @@ void schedule()
     struct node *temp2;
     temp = head;
     int n = 0;
-    int track = 0;
+    int track = 100;
     int total_tracks_traverse = 0;
     float avg_seek_length_time = 0;
-    int traverse;
-    int pos = 0;
+    int trav;
+    int res = 100;
+
     while (temp != NULL)
     {
-        while (temp != NULL)
+        temp2 = get_next_up(temp, track);
+        if (temp2 == NULL)
         {
-            if (temp->access->position > pos)
-            {
-                temp2 = temp;
-                pos = temp->access->position;
-            }
-            temp = temp->next;
+            res = track;
+            track = -1;
+            temp = head;
         }
-
-        traverse = track - temp->access->position;
-        run(temp->access, traverse);
-        total_tracks_traverse += traverse;
-        n++;
-        t = temp->access;
-        temp = head;
-        delete (&head, t);
+        else
+        {
+            trav = abs(res - temp2->access->position);
+            run(temp2->access, trav);
+            total_tracks_traverse += trav;
+            track = temp2->access->position;
+            res = track;
+            n++;
+            t = temp2->access;
+            temp = head;
+            delete (&head, t);
+        }
     }
 
     avg_seek_length_time = (float)total_tracks_traverse / n;
