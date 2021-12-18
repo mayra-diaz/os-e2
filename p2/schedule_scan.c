@@ -77,7 +77,6 @@ void schedule()
             temp2 = get_next_up(temp, track);
         else
             temp2 = get_next_down(temp, track);
-        //printf("%p \n", temp2);
         if (temp2 == NULL)
         {
             up = abs(up - 1);
